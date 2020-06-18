@@ -1,5 +1,7 @@
 package com.fd.guf.features.searchUser
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -11,9 +13,11 @@ import com.fd.guf.custom.action.DelayedTextWatcher
 import com.fd.guf.custom.action.PaginationListener
 import com.fd.guf.dataSource.remote.Repository
 import com.fd.guf.databinding.ActivitySearchUserBinding
+import com.fd.guf.models.User
 import com.fd.guf.utils.Constants
 import com.fd.guf.utils.KeyboardUtil
 import com.fd.guf.utils.State
+
 
 class SearchUsersActivity : BaseActivity() {
 
@@ -50,6 +54,7 @@ class SearchUsersActivity : BaseActivity() {
                 showErrorMessage(error)
             }
         })
+        binding.etSearch.requestFocus()
     }
 
     private fun initAction() {
@@ -72,6 +77,18 @@ class SearchUsersActivity : BaseActivity() {
             override val isLoading: Boolean
                 get() = isLoadMore
         })
+
+        userAdapter.setListener(object : UserAdapter.Listener {
+            override fun onItemClick(user: User) {
+                openWebView(user.htmlUrl)
+            }
+        })
+    }
+
+    private fun openWebView(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(url)
+        startActivity(intent)
     }
 
 }

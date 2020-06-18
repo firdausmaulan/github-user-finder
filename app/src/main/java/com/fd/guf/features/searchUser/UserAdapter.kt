@@ -11,6 +11,15 @@ import com.fd.guf.models.User
 class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     private var users = ArrayList<User>()
+    private var listener : Listener? = null
+
+    interface Listener{
+        fun onItemClick(user: User)
+    }
+
+    fun setListener(listener: Listener){
+        this.listener = listener
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -22,6 +31,9 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         holder.bind(users[position])
+        holder.itemView.setOnClickListener {
+            listener?.onItemClick(users[position])
+        }
     }
 
     inner class UserViewHolder(private val binding: AdapterUserBinding) :
