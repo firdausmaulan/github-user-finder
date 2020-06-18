@@ -1,9 +1,8 @@
-package com.fd.guf.features
+package com.fd.guf.features.searchUser
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.fd.guf.dataSource.remote.Repository
 import com.fd.guf.dataSource.remote.RepositoryCallback
-import com.fd.guf.features.searchUser.SearchUsersViewModel
 import com.fd.guf.models.User
 import com.fd.guf.models.Users
 import com.fd.guf.utils.State
@@ -76,7 +75,7 @@ class SearchUsersViewModelTest {
         val q = "firdaus"
         val page = 1
         // Response
-        val errorMessage = "Something when wrong"
+        val errorMessage = "Error search"
         viewModel.searchUsers(q, page)
         Assert.assertEquals(viewModel.stateLiveData.value, State.LOADING)
         argumentCaptor<RepositoryCallback<Users>>().apply {
@@ -92,7 +91,7 @@ class SearchUsersViewModelTest {
         val q = "firdaus"
         val page = 2
         // Response
-        val errorMessage = "Something when wrong"
+        val errorMessage = "Error load more"
         viewModel.searchUsers(q, page)
         Assert.assertEquals(viewModel.stateLiveData.value, State.LOAD_MORE)
         argumentCaptor<RepositoryCallback<Users>>().apply {
@@ -100,5 +99,30 @@ class SearchUsersViewModelTest {
             firstValue.onDataError(errorMessage)
         }
         Assert.assertEquals(viewModel.stateLiveData.value, State.ERROR_LOAD_MORE)
+    }
+
+    @Test
+    fun `State Query Empty`() {
+        // Params
+        val q = ""
+        val page = 1
+        viewModel.searchUsers(q, page)
+        Assert.assertEquals(viewModel.stateLiveData.value, State.SUCCESS)
+    }
+
+    @Test
+    fun `State List Empty`() {
+        // Params
+        val q = "@#$%^&"
+        val page = 1
+        // Response
+        val errorMessage = "Empty list"
+        viewModel.searchUsers(q, page)
+        Assert.assertEquals(viewModel.stateLiveData.value, State.LOADING)
+        argumentCaptor<RepositoryCallback<Users>>().apply {
+            verify(repository).searchUsers(eq(q), eq(page), capture())
+            firstValue.onDataError(errorMessage)
+        }
+        Assert.assertEquals(viewModel.stateLiveData.value, State.ERROR)
     }
 }

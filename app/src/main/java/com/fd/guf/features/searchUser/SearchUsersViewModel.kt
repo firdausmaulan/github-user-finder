@@ -15,6 +15,10 @@ class SearchUsersViewModel constructor(private val repository: Repository) : Vie
     val errorLiveData = MutableLiveData<String>()
 
     fun searchUsers(q: String?, page: Int?) {
+        if (q?.isEmpty() == true) {
+            stateLiveData.postValue(State.SUCCESS)
+            return
+        }
         if (page == 1) {
             stateLiveData.postValue(State.LOADING)
         } else {

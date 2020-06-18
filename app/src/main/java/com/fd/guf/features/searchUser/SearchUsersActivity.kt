@@ -43,7 +43,7 @@ class SearchUsersActivity : BaseActivity() {
         viewModel.stateLiveData.observe(this, Observer { state ->
             binding.state = state
             isLoadMore = state == State.LOAD_MORE || state == State.LOADING
-            KeyboardUtil.hide(binding.container)
+            if (q.isNotEmpty()) KeyboardUtil.hide(binding.container)
         })
         viewModel.usersLiveData.observe(this, Observer { users ->
             userAdapter.add(users)
@@ -64,7 +64,7 @@ class SearchUsersActivity : BaseActivity() {
             override fun onTextChanged(data: String) {
                 userAdapter.clear()
                 q = data
-                if (data.isNotEmpty()) viewModel.searchUsers(q, 1)
+                viewModel.searchUsers(q, 1)
             }
         })
 
