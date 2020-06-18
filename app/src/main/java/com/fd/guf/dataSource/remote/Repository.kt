@@ -16,7 +16,13 @@ class Repository {
         service.searchUsers(q, page).enqueue(object : Callback<Users> {
             override fun onResponse(call: Call<Users>, response: Response<Users>) {
                 if (response.isSuccessful && response.code() == 200) {
-                    response.body()?.let { callback.onDataLoaded(it) }
+                    response.body()?.let {
+                        if (page == 1 && it.items.isEmpty()) {
+                            callback.onDataError(context.getString(R.string.user_not_found))
+                        } else {
+                            callback.onDataLoaded(it)
+                        }
+                    }
                 } else {
                     callback.onDataError(response.message())
                 }
