@@ -64,14 +64,14 @@ class SearchUsersActivity : BaseActivity() {
             override fun onTextChanged(data: String) {
                 userAdapter.clear()
                 q = data
-                viewModel.searchUsers(q, 1)
+                viewModel.searchUsers(q)
             }
         })
 
         binding.rvUser.addOnScrollListener(object :
             PaginationListener(binding.rvUser.layoutManager) {
             override fun loadMoreItems() {
-                viewModel.searchUsers(q, userAdapter.itemCount / Constants.PER_PAGE + 1)
+                viewModel.loadMoreUsers(q, userAdapter.itemCount / Constants.PER_PAGE + 1)
             }
 
             override val isLoading: Boolean

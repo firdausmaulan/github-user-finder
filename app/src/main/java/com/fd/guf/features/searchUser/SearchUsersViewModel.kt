@@ -14,32 +14,35 @@ class SearchUsersViewModel constructor(private val repository: Repository) : Vie
     val usersLiveData = MutableLiveData<List<User>>()
     val errorLiveData = MutableLiveData<String>()
 
-    fun searchUsers(q: String?, page: Int?) {
+    fun searchUsers(q: String?) {
         if (q?.isEmpty() == true) {
             stateLiveData.postValue(State.SUCCESS)
             return
         }
-        if (page == 1) {
-            stateLiveData.postValue(State.LOADING)
-        } else {
-            stateLiveData.postValue(State.LOAD_MORE)
-        }
-        repository.searchUsers(q, page, object : RepositoryCallback<Users> {
+        stateLiveData.postValue(State.LOADING)
+        repository.searchUsers(q, 1, object : RepositoryCallback<Users> {
             override fun onDataLoaded(response: Users) {
-                if (page == 1) {
-                    stateLiveData.postValue(State.SUCCESS)
-                } else {
-                    stateLiveData.postValue(State.SUCCESS_LOAD_MORE)
-                }
+                stateLiveData.postValue(State.SUCCESS)
                 usersLiveData.postValue(response.items)
             }
 
             override fun onDataError(error: String?) {
-                if (page == 1) {
-                    stateLiveData.postValue(State.ERROR)
-                } else {
-                    stateLiveData.postValue(State.ERROR_LOAD_MORE)
-                }
+                stateLiveData.postValue(State.ERROR)
+                errorLiveData.postValue(error.toString())
+            }
+        })
+    }
+
+    fun loadMoreUsers(q: String?, page: Int?) {
+        stateLiveData.postValue(State.LOAD_MORE)
+        repository.searchUsers(q, page, object : RepositoryCallback<Users> {
+            override fun onDataLoaded(response: Users) {
+                stateLiveData.postValue(State.SUCCESS_LOAD_MORE)
+                usersLiveData.postValue(response.items)
+            }
+
+            override fun onDataError(error: String?) {
+                stateLiveData.postValue(State.ERROR_LOAD_MORE)
                 errorLiveData.postValue(error.toString())
             }
         })
