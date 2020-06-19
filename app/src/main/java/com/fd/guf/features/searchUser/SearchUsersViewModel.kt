@@ -13,6 +13,7 @@ class SearchUsersViewModel constructor(private val repository: Repository) : Vie
     val stateLiveData = MutableLiveData<String>()
     val usersLiveData = MutableLiveData<List<User>>()
     val errorLiveData = MutableLiveData<String>()
+    var totalCount = 0
 
     fun searchUsers(q: String?) {
         if (q?.isEmpty() == true) {
@@ -23,6 +24,7 @@ class SearchUsersViewModel constructor(private val repository: Repository) : Vie
         repository.searchUsers(q, 1, object : RepositoryCallback<Users> {
             override fun onDataLoaded(response: Users) {
                 stateLiveData.postValue(State.SUCCESS)
+                totalCount = response.totalCount
                 usersLiveData.postValue(response.items)
             }
 

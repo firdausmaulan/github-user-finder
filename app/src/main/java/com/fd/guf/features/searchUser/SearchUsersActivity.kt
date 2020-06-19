@@ -25,7 +25,6 @@ class SearchUsersActivity : BaseActivity() {
     private lateinit var viewModel: SearchUsersViewModel
     private val userAdapter = UserAdapter()
     private var q = ""
-    private var isLoadMore = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +41,6 @@ class SearchUsersActivity : BaseActivity() {
         binding.rvUser.adapter = userAdapter
         viewModel.stateLiveData.observe(this, Observer { state ->
             binding.state = state
-            isLoadMore = state == State.LOAD_MORE || state == State.LOADING
             if (q.isNotEmpty()) KeyboardUtil.hide(binding.container)
         })
         viewModel.usersLiveData.observe(this, Observer { users ->
@@ -75,7 +73,10 @@ class SearchUsersActivity : BaseActivity() {
             }
 
             override val isLoading: Boolean
-                get() = isLoadMore
+                get() = viewModel.stateLiveData.value.equals(State.LOAD_MORE)
+
+            override val isLastPage: Boolean
+                get() = userAdapter.itemCount == viewModel.totalCount
         })
 
         userAdapter.setListener(object : UserAdapter.Listener {
