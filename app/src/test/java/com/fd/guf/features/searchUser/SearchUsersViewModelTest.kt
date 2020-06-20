@@ -30,77 +30,70 @@ class SearchUsersViewModelTest {
     fun setup() {
         MockitoAnnotations.initMocks(this)
         viewModel = SearchUsersViewModel(repository)
+        viewModel.query = "search value"
     }
 
     @Test
     fun `State Success`() {
         // Params
-        val q = "firdaus"
+        val q = "search value"
         val page = 1
         val response = Users()
         viewModel.searchUsers(q)
-        Assert.assertEquals(viewModel.stateLiveData.value, State.LOADING)
+        Assert.assertEquals(State.LOADING, viewModel.stateLiveData.value)
         argumentCaptor<RepositoryCallback<Users>>().apply {
             verify(repository).searchUsers(eq(q), eq(page), capture())
             firstValue.onDataLoaded(response)
         }
-        Assert.assertEquals(viewModel.stateLiveData.value, State.SUCCESS)
+        Assert.assertEquals(State.SUCCESS, viewModel.stateLiveData.value)
     }
 
     @Test
     fun `State Success Load More`() {
         // Params
-        val q = "firdaus"
+        val q = "search value"
         val page = 2
         // Response
         val response = Users()
-        viewModel.loadMoreUsers(q, page)
-        Assert.assertEquals(viewModel.stateLiveData.value, State.LOAD_MORE)
+        viewModel.loadMoreUsers(q)
+        Assert.assertEquals(State.LOAD_MORE, viewModel.stateLiveData.value)
         argumentCaptor<RepositoryCallback<Users>>().apply {
             verify(repository).searchUsers(eq(q), eq(page), capture())
             firstValue.onDataLoaded(response)
         }
-        Assert.assertEquals(viewModel.stateLiveData.value, State.SUCCESS_LOAD_MORE)
+        Assert.assertEquals(State.SUCCESS_LOAD_MORE, viewModel.stateLiveData.value)
     }
 
     @Test
     fun `State Error`() {
         // Params
-        val q = "firdaus"
+        val q = "search value"
         val page = 1
         // Response
         val errorMessage = "Error search"
         viewModel.searchUsers(q)
-        Assert.assertEquals(viewModel.stateLiveData.value, State.LOADING)
+        Assert.assertEquals(State.LOADING, viewModel.stateLiveData.value)
         argumentCaptor<RepositoryCallback<Users>>().apply {
             verify(repository).searchUsers(eq(q), eq(page), capture())
             firstValue.onDataError(errorMessage)
         }
-        Assert.assertEquals(viewModel.stateLiveData.value, State.ERROR)
+        Assert.assertEquals(State.ERROR, viewModel.stateLiveData.value)
     }
 
     @Test
     fun `State Error Load More`() {
         // Params
-        val q = "firdaus"
+        val q = "search value"
         val page = 2
         // Response
         val errorMessage = "Error load more"
-        viewModel.loadMoreUsers(q, page)
-        Assert.assertEquals(viewModel.stateLiveData.value, State.LOAD_MORE)
+        viewModel.loadMoreUsers(q)
+        Assert.assertEquals(State.LOAD_MORE, viewModel.stateLiveData.value)
         argumentCaptor<RepositoryCallback<Users>>().apply {
             verify(repository).searchUsers(eq(q), eq(page), capture())
             firstValue.onDataError(errorMessage)
         }
-        Assert.assertEquals(viewModel.stateLiveData.value, State.ERROR_LOAD_MORE)
-    }
-
-    @Test
-    fun `State Query Empty`() {
-        // Params
-        val q = ""
-        viewModel.searchUsers(q)
-        Assert.assertEquals(viewModel.stateLiveData.value, State.SUCCESS)
+        Assert.assertEquals(State.ERROR_LOAD_MORE, viewModel.stateLiveData.value)
     }
 
     @Test
@@ -111,11 +104,27 @@ class SearchUsersViewModelTest {
         // Response
         val errorMessage = "Empty list"
         viewModel.searchUsers(q)
-        Assert.assertEquals(viewModel.stateLiveData.value, State.LOADING)
+        Assert.assertEquals(State.LOADING, viewModel.stateLiveData.value)
         argumentCaptor<RepositoryCallback<Users>>().apply {
             verify(repository).searchUsers(eq(q), eq(page), capture())
             firstValue.onDataError(errorMessage)
         }
-        Assert.assertEquals(viewModel.stateLiveData.value, State.ERROR)
+        Assert.assertEquals(State.ERROR, viewModel.stateLiveData.value)
+    }
+
+    @Test
+    fun `State Has Next Page`() {
+        viewModel.page = 1
+        viewModel.totalCount = 30
+        val result = viewModel.hasNexPage()
+        Assert.assertEquals(true, result)
+    }
+
+    @Test
+    fun `State Hasn't Next Page`() {
+        viewModel.page = 1
+        viewModel.totalCount = 20
+        val result = viewModel.hasNexPage()
+        Assert.assertEquals(false, result)
     }
 }

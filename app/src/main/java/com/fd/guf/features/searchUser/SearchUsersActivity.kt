@@ -68,7 +68,9 @@ class SearchUsersActivity : BaseActivity() {
         binding.rvUser.addOnScrollListener(object :
             PaginationListener(binding.rvUser.layoutManager) {
             override fun loadMoreItems() {
-                viewModel.loadMoreUsers(viewModel.query)
+                if (viewModel.hasNexPage()) {
+                    viewModel.loadMoreUsers(viewModel.query)
+                }
             }
 
             override val isLoading: Boolean

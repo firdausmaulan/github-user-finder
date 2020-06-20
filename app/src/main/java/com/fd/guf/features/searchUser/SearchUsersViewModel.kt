@@ -41,24 +41,22 @@ class SearchUsersViewModel constructor(private val repository: Repository) : Vie
     }
 
     fun loadMoreUsers(query: String) {
-        if (hasNexPage()) {
-            page++
-            stateLiveData.postValue(State.LOAD_MORE)
-            repository.searchUsers(query, page, object : RepositoryCallback<Users> {
-                override fun onDataLoaded(response: Users) {
-                    stateLiveData.postValue(State.SUCCESS_LOAD_MORE)
-                    usersLiveData.postValue(response.items)
-                }
+        page++
+        stateLiveData.postValue(State.LOAD_MORE)
+        repository.searchUsers(query, page, object : RepositoryCallback<Users> {
+            override fun onDataLoaded(response: Users) {
+                stateLiveData.postValue(State.SUCCESS_LOAD_MORE)
+                usersLiveData.postValue(response.items)
+            }
 
-                override fun onDataError(error: String?) {
-                    stateLiveData.postValue(State.ERROR_LOAD_MORE)
-                    errorLiveData.postValue(error.toString())
-                }
-            })
-        }
+            override fun onDataError(error: String?) {
+                stateLiveData.postValue(State.ERROR_LOAD_MORE)
+                errorLiveData.postValue(error.toString())
+            }
+        })
     }
 
-    private fun hasNexPage(): Boolean {
+    fun hasNexPage(): Boolean {
         return page * Constants.PER_PAGE < totalCount
     }
 }
