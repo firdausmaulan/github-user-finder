@@ -3,8 +3,6 @@ package com.fd.guf.features.splash
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.view.MotionEvent
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.databinding.DataBindingUtil

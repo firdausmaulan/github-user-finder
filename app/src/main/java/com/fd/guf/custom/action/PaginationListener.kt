@@ -14,7 +14,7 @@ abstract class PaginationListener(private val rvLayoutManager: RecyclerView.Layo
         val visibleItemCount = layoutManager.childCount
         val totalItemCount = layoutManager.itemCount
         val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
-        if (!isLoading && !isLastPage) {
+        if (!isLoading && hasNextPage) {
             if (visibleItemCount + firstVisibleItemPosition >= totalItemCount
                 && firstVisibleItemPosition >= 0
                 && totalItemCount >= Constants.PER_PAGE
@@ -26,5 +26,5 @@ abstract class PaginationListener(private val rvLayoutManager: RecyclerView.Layo
 
     protected abstract fun loadMoreItems()
     abstract val isLoading: Boolean
-    abstract val isLastPage: Boolean
+    abstract val hasNextPage: Boolean
 }

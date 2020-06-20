@@ -14,17 +14,14 @@ import com.fd.guf.custom.action.PaginationListener
 import com.fd.guf.dataSource.remote.Repository
 import com.fd.guf.databinding.ActivitySearchUserBinding
 import com.fd.guf.models.User
-import com.fd.guf.utils.Constants
 import com.fd.guf.utils.KeyboardUtil
 import com.fd.guf.utils.State
-
 
 class SearchUsersActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySearchUserBinding
     private lateinit var viewModel: SearchUsersViewModel
     private val userAdapter = UserAdapter()
-    private var q = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +38,8 @@ class SearchUsersActivity : BaseActivity() {
         binding.rvUser.adapter = userAdapter
         viewModel.stateLiveData.observe(this, Observer { state ->
             binding.state = state
-            if (q.isNotEmpty()) KeyboardUtil.hide(binding.container)
+            userAdapter.setState(state)
+            if (viewModel.query.isNotEmpty()) KeyboardUtil.hide(binding.container)
         })
         viewModel.usersLiveData.observe(this, Observer { users ->
             userAdapter.add(users)
@@ -60,23 +58,24 @@ class SearchUsersActivity : BaseActivity() {
         binding.etSearch.addTextChangedListener(searchTextWatcher)
         searchTextWatcher.setListener(object : DelayedTextWatcher.Listener {
             override fun onTextChanged(data: String) {
-                userAdapter.clear()
-                q = data
-                viewModel.searchUsers(q)
+                if (data != viewModel.query) {
+                    userAdapter.clear()
+                    viewModel.searchUsers(data)
+                }
             }
         })
 
         binding.rvUser.addOnScrollListener(object :
             PaginationListener(binding.rvUser.layoutManager) {
             override fun loadMoreItems() {
-                viewModel.loadMoreUsers(q, userAdapter.itemCount / Constants.PER_PAGE + 1)
+                viewModel.loadMoreUsers(viewModel.query)
             }
 
             override val isLoading: Boolean
                 get() = viewModel.stateLiveData.value.equals(State.LOAD_MORE)
 
-            override val isLastPage: Boolean
-                get() = userAdapter.itemCount == viewModel.totalCount
+            override val hasNextPage: Boolean
+                get() = userAdapter.itemCount < viewModel.totalCount
         })
 
         userAdapter.setListener(object : UserAdapter.Listener {

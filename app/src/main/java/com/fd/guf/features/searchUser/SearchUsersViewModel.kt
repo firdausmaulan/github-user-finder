@@ -6,6 +6,7 @@ import com.fd.guf.dataSource.remote.Repository
 import com.fd.guf.dataSource.remote.RepositoryCallback
 import com.fd.guf.models.User
 import com.fd.guf.models.Users
+import com.fd.guf.utils.Constants
 import com.fd.guf.utils.State
 
 class SearchUsersViewModel constructor(private val repository: Repository) : ViewModel() {
@@ -13,15 +14,19 @@ class SearchUsersViewModel constructor(private val repository: Repository) : Vie
     val stateLiveData = MutableLiveData<String>()
     val usersLiveData = MutableLiveData<List<User>>()
     val errorLiveData = MutableLiveData<String>()
+    var query = ""
+    var page = Constants.START_PAGE
     var totalCount = 0
 
-    fun searchUsers(q: String?) {
-        if (q?.isEmpty() == true) {
+    fun searchUsers(query: String) {
+        this.page = Constants.START_PAGE
+        this.query = query
+        if (query.isEmpty()) {
             stateLiveData.postValue(State.SUCCESS)
             return
         }
         stateLiveData.postValue(State.LOADING)
-        repository.searchUsers(q, 1, object : RepositoryCallback<Users> {
+        repository.searchUsers(query, page, object : RepositoryCallback<Users> {
             override fun onDataLoaded(response: Users) {
                 stateLiveData.postValue(State.SUCCESS)
                 totalCount = response.totalCount
@@ -35,18 +40,25 @@ class SearchUsersViewModel constructor(private val repository: Repository) : Vie
         })
     }
 
-    fun loadMoreUsers(q: String?, page: Int?) {
-        stateLiveData.postValue(State.LOAD_MORE)
-        repository.searchUsers(q, page, object : RepositoryCallback<Users> {
-            override fun onDataLoaded(response: Users) {
-                stateLiveData.postValue(State.SUCCESS_LOAD_MORE)
-                usersLiveData.postValue(response.items)
-            }
+    fun loadMoreUsers(query: String) {
+        if (hasNexPage()) {
+            page++
+            stateLiveData.postValue(State.LOAD_MORE)
+            repository.searchUsers(query, page, object : RepositoryCallback<Users> {
+                override fun onDataLoaded(response: Users) {
+                    stateLiveData.postValue(State.SUCCESS_LOAD_MORE)
+                    usersLiveData.postValue(response.items)
+                }
 
-            override fun onDataError(error: String?) {
-                stateLiveData.postValue(State.ERROR_LOAD_MORE)
-                errorLiveData.postValue(error.toString())
-            }
-        })
+                override fun onDataError(error: String?) {
+                    stateLiveData.postValue(State.ERROR_LOAD_MORE)
+                    errorLiveData.postValue(error.toString())
+                }
+            })
+        }
+    }
+
+    private fun hasNexPage(): Boolean {
+        return page * Constants.PER_PAGE < totalCount
     }
 }
