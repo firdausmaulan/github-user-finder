@@ -24,12 +24,11 @@ interface ApiService {
             if (BuildConfig.DEBUG) client.addInterceptor(ChuckInterceptor(BaseApp.context))
 
             client.addInterceptor { chain ->
-                var request = chain.request()
-                val url = request.url().newBuilder()
-                    .addQueryParameter("Accept", "application/json")
+                val request = chain.request()
+                val newRequest = request.newBuilder()
+                    .addHeader("Accept", "application/json")
                     .build()
-                request = request.newBuilder().url(url).build()
-                chain.proceed(request)
+                chain.proceed(newRequest)
             }
 
             return retrofit.client(client.build()).build().create(ApiService::class.java)
