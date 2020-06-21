@@ -59,4 +59,9 @@ class SearchUsersViewModel constructor(private val repository: Repository) : Vie
     fun hasNexPage(): Boolean {
         return page * Constants.PER_PAGE < totalCount
     }
+
+    override fun onCleared() {
+        repository.dispose()
+        super.onCleared()
+    }
 }

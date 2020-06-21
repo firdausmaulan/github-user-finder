@@ -5,11 +5,13 @@ import com.fd.guf.base.BaseApp
 import com.fd.guf.models.Users
 import com.fd.guf.utils.Constants
 import com.readystatesoftware.chuck.ChuckInterceptor
+import io.reactivex.Single
 import okhttp3.OkHttpClient
-import retrofit2.Call
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+
 
 interface ApiService {
 
@@ -17,6 +19,7 @@ interface ApiService {
         fun create(): ApiService {
             val retrofit = retrofit2.Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .baseUrl(BuildConfig.BASE_URL)
 
             val client = OkHttpClient.Builder()
@@ -40,7 +43,7 @@ interface ApiService {
     fun searchUsers(
         @Query("q") q: String?,
         @Query("page") page: Int?,
-        @Query("per_page") perPage : Int? = Constants.PER_PAGE
-    ): Call<Users>
+        @Query("per_page") perPage: Int? = Constants.PER_PAGE
+    ): Single<Users>
 
 }
