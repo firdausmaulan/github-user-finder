@@ -1,7 +1,9 @@
 package com.fd.guf.di
 
+import android.content.Context
 import com.fd.guf.BuildConfig
 import com.fd.guf.dataSource.remote.ApiService
+import com.readystatesoftware.chuck.ChuckInterceptor
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -10,14 +12,14 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-@Module
+@Module(includes = [AppModule::class])
 class NetworkModule {
 
     @Singleton
     @Provides
-    fun providesHttpClient(): OkHttpClient =
+    fun providesHttpClient(context: Context): OkHttpClient =
         OkHttpClient.Builder().apply {
-            //if (BuildConfig.DEBUG) addInterceptor(ChuckInterceptor(context))
+            if (BuildConfig.DEBUG) addInterceptor(ChuckInterceptor(context))
             addInterceptor { chain ->
                 val request = chain.request()
                 val newRequest = request.newBuilder()
@@ -29,17 +31,17 @@ class NetworkModule {
 
     @Singleton
     @Provides
-    fun provideClient(): Retrofit =
+    fun provideClient(context: Context): Retrofit =
         Retrofit.Builder().apply {
-            client(providesHttpClient())
+            client(providesHttpClient(context))
             baseUrl(BuildConfig.BASE_URL)
             addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync())
             addConverterFactory(GsonConverterFactory.create())
         }.build()
 
     @Provides
-    fun provideService(): ApiService {
-        return provideClient().create(ApiService::class.java)
+    fun provideService(context: Context): ApiService {
+        return provideClient(context).create(ApiService::class.java)
     }
 
     /*@Singleton
