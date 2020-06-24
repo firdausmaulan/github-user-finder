@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fd.guf.R
 import com.fd.guf.base.BaseActivity
+import com.fd.guf.base.BaseApp
 import com.fd.guf.custom.action.DelayedTextWatcher
 import com.fd.guf.custom.action.PaginationListener
 import com.fd.guf.dataSource.remote.Repository
@@ -16,8 +17,12 @@ import com.fd.guf.databinding.ActivitySearchUserBinding
 import com.fd.guf.models.User
 import com.fd.guf.utils.KeyboardUtil
 import com.fd.guf.utils.State
+import javax.inject.Inject
 
 class SearchUsersActivity : BaseActivity() {
+
+    @Inject
+    lateinit var repository: Repository
 
     private lateinit var binding: ActivitySearchUserBinding
     private lateinit var viewModel: SearchUsersViewModel
@@ -25,8 +30,9 @@ class SearchUsersActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as BaseApp).getComponent().inject(this)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search_user)
-        viewModel = ViewModelProvider(this, SearchUsersFactory(Repository()))
+        viewModel = ViewModelProvider(this, SearchUsersFactory(repository))
             .get(SearchUsersViewModel::class.java)
         initView()
         initAction()

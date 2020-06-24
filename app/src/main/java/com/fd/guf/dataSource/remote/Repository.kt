@@ -1,5 +1,6 @@
 package com.fd.guf.dataSource.remote
 
+import android.content.Context
 import com.fd.guf.R
 import com.fd.guf.base.BaseApp
 import com.fd.guf.models.Users
@@ -7,10 +8,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-class Repository {
+class Repository constructor(private val context: Context, private val service: ApiService) {
 
-    private val context = BaseApp.context
-    private val service = ApiService.create()
     private val compositeDisposable = CompositeDisposable()
 
     fun searchUsers(q: String?, page: Int?, callback: RepositoryCallback<Users>) {
