@@ -5,29 +5,26 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fd.guf.R
 import com.fd.guf.base.BaseActivity
 import com.fd.guf.custom.action.DelayedTextWatcher
 import com.fd.guf.custom.action.PaginationListener
-import com.fd.guf.dataSource.remote.Repository
 import com.fd.guf.databinding.ActivitySearchUserBinding
 import com.fd.guf.models.User
 import com.fd.guf.utils.KeyboardUtil
 import com.fd.guf.utils.State
+import org.koin.android.ext.android.inject
 
 class SearchUsersActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySearchUserBinding
-    private lateinit var viewModel: SearchUsersViewModel
+    private val viewModel: SearchUsersViewModel by inject()
     private val userAdapter = UserAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_search_user)
-        viewModel = ViewModelProvider(this, SearchUsersFactory(Repository()))
-            .get(SearchUsersViewModel::class.java)
         initView()
         initAction()
     }
