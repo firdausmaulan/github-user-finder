@@ -26,7 +26,7 @@ interface ApiService {
             client.addInterceptor { chain ->
                 val request = chain.request()
                 val newRequest = request.newBuilder()
-                    .addHeader("Accept", "application/json")
+                    .addHeader("Accept", "application/vnd.github.v3+json")
                     .build()
                 chain.proceed(newRequest)
             }
