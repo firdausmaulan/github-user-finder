@@ -36,7 +36,7 @@ public class SearchUserInstrumentedTest extends BaseInstrumentedTest {
     public void listTest() {
         onView(withId(R.id.etSearch))
                 .perform(typeText("firdaus"), closeSoftKeyboard());
-        sleep();
+        sleep(); // for async edit text
         onView(withId(R.id.rvUser)).check(isVisible());
         onView(withId(R.id.lytError)).check(isGone());
     }
@@ -45,7 +45,7 @@ public class SearchUserInstrumentedTest extends BaseInstrumentedTest {
     public void emptyTest() {
         onView(withId(R.id.etSearch))
                 .perform(typeText("impossible user 123"), closeSoftKeyboard());
-        sleep();
+        sleep(); // for async edit text
         onView(withId(R.id.rvUser)).check(isGone());
         onView(withId(R.id.lytError)).check(isVisible());
     }
